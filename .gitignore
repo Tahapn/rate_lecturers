@@ -163,3 +163,7 @@ cython_debug/
 
 #db
 mysql-data/
+
+#profile pictures
+*.png
+*.jpeg
