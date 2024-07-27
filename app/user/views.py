@@ -1,13 +1,13 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate
 from rest_framework import generics
 from rest_framework import status
-from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
 from .serializers import UserSerializer, UserTokenSerializer
+from .forms import UserForm
+
+#### APIs ####
 
 
 class UserCreateView(generics.CreateAPIView):
@@ -26,3 +26,16 @@ class TokenView(generics.CreateAPIView):
             return Response({'Token': token.key}, status=status.HTTP_201_CREATED)
         else:
             return Response({'msg': 'Invalid credentials or user does not exitst'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+#### template ####
+
+def create_user(request):
+    if request.method == 'POST':
+        form = UserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('')
+    else:
+        form = UserForm()
+    return render(request, 'user/create_user.html', {'form': form})
