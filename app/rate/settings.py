@@ -148,3 +148,6 @@ REST_FRAMEWORK = {
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
+
+# login logout urls
+LOGIN_URL = 'login'

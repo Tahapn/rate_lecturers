@@ -1,12 +1,13 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, get_user_model, login
+from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.contrib.auth.decorators import login_required
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .serializers import UserSerializer, UserTokenSerializer, UserDetailSerializer
-from .forms import UserForm, UserLogInForm
+from .forms import UserForm, UserLogInForm, UserProfileForm
 
 #### APIs ####
 
@@ -51,7 +52,10 @@ def create_user(request):
 
 
 def log_in(request):
-    if request.method == 'POST':
+    # redirects to home if user is already logged in
+    if request.user.is_authenticated:
+        return redirect('home')
+    elif request.method == 'POST':
         form = UserLogInForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
@@ -64,3 +68,20 @@ def log_in(request):
         form = UserLogInForm()
 
     return render(request, 'user/login.html', {'form': form})
+
+
+def log_out(request):
+    logout(request)
+    return redirect('home')
+
+
+@login_required
+def profile(request):
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+    else:
+        form = UserProfileForm(instance=request.user)
+    return render(request, 'user/profile.html', {'form': form})

@@ -1,0 +1,16 @@
+{% extends 'with_nav.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %} User Profile {% endblock title %}
+
+
+{% block content %}
+<br><br>
+<div class="container">
+    <form method="post">
+        {% csrf_token %}
+        {{form|crispy}}
+        <button type="submit" class="btn btn-primary mt-3">Submit</button>
+    </form>
+</div>
+{% endblock content %}
