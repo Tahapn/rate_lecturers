@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',  # for authenticating using Token
     'crispy_forms',
     'crispy_bootstrap4',
+    'drf_yasg',
+    "debug_toolbar",
+
 
     # apps
     'core',
@@ -50,6 +53,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -151,3 +155,12 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 # login logout urls
 LOGIN_URL = 'login'
+
+# show debug toolbar in docker
+if DEBUG:
+    def show_toolbar(request):
+        return True
+
+    DEBUG_TOOLBAR_CONFIG = {
+        'SHOW_TOOLBAR_CALLBACK': show_toolbar,
+    }
