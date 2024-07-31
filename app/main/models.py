@@ -1,4 +1,4 @@
-from typing import Iterable
+from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
 # Create your models here.
@@ -50,3 +50,18 @@ class LecturerSubject(models.Model):
 
     def __str__(self) -> str:
         return self.slug
+
+
+class Review(models.Model):
+
+    RATINGS = [(i, i) for i in range(1, 6)]
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.PROTECT)
+    lecturer_subject = models.ForeignKey(
+        LecturerSubject, on_delete=models.CASCADE)
+    rate = models.IntegerField(choices=RATINGS)
+    comment = models.TextField(null=True, blank=True)
+
+    def __str__(self) -> str:
+        return f'{self.user.username}-{self.rate}'
