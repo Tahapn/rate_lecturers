@@ -39,7 +39,8 @@ class Subject(models.Model):
 
 
 class LecturerSubject(models.Model):
-    lecturer = models.ForeignKey(Lecturer, on_delete=models.CASCADE)
+    lecturer = models.ForeignKey(
+        Lecturer, on_delete=models.CASCADE, related_name='subjects')
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     slug = models.SlugField(unique=True, blank=True)
 
