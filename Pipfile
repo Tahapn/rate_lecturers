@@ -10,8 +10,8 @@ pillow = "*"
 djangorestframework = "*"
 django-crispy-forms = "*"
 crispy-bootstrap4 = "*"
-django-debug-toolbar = "*"
 drf-yasg = "*"
+django-debug-toolbar = "==4.3.*"
 
 [dev-packages]
 
