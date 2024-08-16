@@ -2,8 +2,10 @@ from django.shortcuts import render, get_object_or_404
 from django.db.models import Avg, Count
 from rest_framework import generics
 from rest_framework.viewsets import ReadOnlyModelViewSet
-from .models import Lecturer, LecturerSubject
-from .serializers import LecturerSerializer, LecturerSubjectSerializer
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from .models import Lecturer, LecturerSubject, Review
+from .serializers import LecturerSerializer, LecturerSubjectSerializer, ReviewSerializer
+from .permissions import IsOwnerOrReadOnly
 
 
 def temp(request):
@@ -36,3 +38,22 @@ class LecturerSubjectDetail(generics.RetrieveAPIView):
 
     def get_serializer_context(self):
         return {'lecturer_pk': self.kwargs['lecturer_pk']}
+
+
+class ReviewList(generics.ListCreateAPIView):
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        return Review.objects.filter(lecturer_subject=self.kwargs['subject_pk'])
+
+    def perform_create(self, serializer):
+        return serializer.save(user=self.request.user, lecturer_subject_id=self.kwargs['subject_pk'])
+
+
+class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ReviewSerializer
+    permission_classes = [IsOwnerOrReadOnly]
+
+    def get_queryset(self):
+        return Review.objects.filter(lecturer_subject_id=self.kwargs['subject_pk'], pk=self.kwargs['pk'])

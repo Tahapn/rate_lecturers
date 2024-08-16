@@ -1,6 +1,6 @@
 from django.db.models import Count
 from rest_framework import serializers
-from .models import Lecturer, LecturerSubject
+from .models import Lecturer, LecturerSubject, Review
 
 
 class LecturerSubjectSerializer(serializers.ModelSerializer):
@@ -31,3 +31,10 @@ class LecturerSerializer(serializers.ModelSerializer):
         model = Lecturer
         fields = ['id', 'first_name', 'last_name',
                   'average_ratings', 'picture', 'subjects']
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ['id', 'user', 'lecturer_subject', 'rate', 'comment']
+        read_only_fields = ['user', 'lecturer_subject']
