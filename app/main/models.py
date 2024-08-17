@@ -8,7 +8,7 @@ class Lecturer(models.Model):
     first_name = models.CharField(max_length=55, null=False)
     last_name = models.CharField(max_length=55, null=False)
     picture = models.ImageField(
-        upload_to='main/profile_pictures/', null=True, blank=True)
+        upload_to='main/profile_pictures/', default='main/profile_pictures/default_pfp.jpeg')
     slug = models.SlugField(unique=True, blank=True)
 
     class Meta:

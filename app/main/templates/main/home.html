@@ -1,0 +1,35 @@
+{% extends 'with_nav.html' %}
+
+{% block title %} Home {% endblock title %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <div class="row">
+        {% for lecturer in lecturers %}
+        <div class="col-md-4 mb-4">
+            <div class="card" style="background-color: #323F4B; color: white;">
+                <img src="{{ lecturer.picture.url }}" class="card-img-top"
+                    alt="{{ lecturer.first_name }} {{ lecturer.last_name }}" style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ lecturer.first_name }} {{ lecturer.last_name }}</h5>
+                    <p class="card-text">Average Ratings: {{ lecturer.average_ratings }}</p>
+                    <h6>Subjects:</h6>
+                    <div>
+                        {% for subject in lecturer.subjects.all %}
+                        <a href="google.com" class="btn btn-primary mb-2"
+                            style="background-color: #007bff; border-color: #007bff; color: white; transition: background-color 0.3s, color 0.3s;"
+                            onmouseover="this.style.backgroundColor='#0056b3'; this.style.color='white';"
+                            onmouseout="this.style.backgroundColor='#007bff'; this.style.color='white';">{{subject.subject.name}}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+{% endblock content %}

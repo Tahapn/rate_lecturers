@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import SimpleRouter
-from .views import temp, LecturerViewSet, LecturerSubjectList, LecturerSubjectDetail, ReviewList, ReviewDetail
+from .views import home, LecturerViewSet, LecturerSubjectList, LecturerSubjectDetail, ReviewList, ReviewDetail
 
 router = SimpleRouter()
 
@@ -19,6 +19,6 @@ urlpatterns = [
          ReviewDetail.as_view()),
 
     # Templates
-    path('', temp, name='home'),
+    path('', home, name='home'),
 
 ]

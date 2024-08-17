@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Avg, Count
+from django.db.models.functions import Round
 from rest_framework import generics
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -8,8 +9,7 @@ from .serializers import LecturerSerializer, LecturerSubjectSerializer, ReviewSe
 from .permissions import IsOwnerOrReadOnly
 
 
-def temp(request):
-    return render(request, 'with_nav.html')
+#### APIs ####
 
 
 class LecturerViewSet(ReadOnlyModelViewSet):
@@ -57,3 +57,13 @@ class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return Review.objects.filter(lecturer_subject_id=self.kwargs['subject_pk'], pk=self.kwargs['pk'])
+
+#### Templates ####
+
+
+def home(request):
+    lecturers = Lecturer.objects.prefetch_related('subjects__subject').annotate(
+        average_ratings=Round(Avg('subjects__review__rate'), 2)
+    )
+
+    return render(request, 'main/home.html', {'lecturers': lecturers})
