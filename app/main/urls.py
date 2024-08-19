@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import SimpleRouter
-from .views import home, LecturerViewSet, LecturerSubjectList, LecturerSubjectDetail, ReviewList, ReviewDetail
+from .views import home, subjects, LecturerViewSet, LecturerSubjectList, LecturerSubjectDetail, ReviewList, ReviewDetail
 
 router = SimpleRouter()
 
@@ -20,5 +20,5 @@ urlpatterns = [
 
     # Templates
     path('', home, name='home'),
-
+    path('<str:lecturer_slug>/<str:subject_slug>/', subjects, name='subjects')
 ]

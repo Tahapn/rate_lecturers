@@ -63,6 +63,7 @@ class Review(models.Model):
         LecturerSubject, on_delete=models.CASCADE)
     rate = models.IntegerField(choices=RATINGS)
     comment = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return f'{self.user.username}-{self.rate}'
