@@ -1,4 +1,5 @@
-from django.shortcuts import render, get_object_or_404, get_list_or_404
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect
 from django.db.models import Avg, Count
 from django.db.models.functions import Round
 from rest_framework import generics
@@ -7,7 +8,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .models import Lecturer, LecturerSubject, Review
 from .serializers import LecturerSerializer, LecturerSubjectSerializer, ReviewSerializer
 from .permissions import IsOwnerOrReadOnly
-
+from .forms import ReviewForm
 
 #### APIs ####
 
@@ -70,16 +71,32 @@ def home(request):
 
 
 def subjects(request, lecturer_slug, subject_slug):
+    if request.method == 'POST':
+        post_data = request.POST.copy()
+        post_data['rate'] = int(post_data['rate'])
+        form = ReviewForm(post_data)
+        if form.is_valid():
+            lecturer_subject = LecturerSubject.objects.get(
+                lecturer__slug=lecturer_slug, subject__slug=subject_slug)
+            instance = form.save(commit=False)
+            instance.user = request.user
+            instance.lecturer_subject = lecturer_subject
+            instance.save()
+            return HttpResponseRedirect(request.get_full_path())
+        else:
+            print(form.errors)
+    else:
+        form = ReviewForm()
 
-    lecturer = get_object_or_404(
-        Lecturer.objects.filter(slug=lecturer_slug).annotate(
-            average=Round(Avg('subjects__review__rate'), 2)
+        lecturer = get_object_or_404(
+            Lecturer.objects.filter(slug=lecturer_slug).annotate(
+                average=Round(Avg('subjects__review__rate'), 2)
+            )
         )
-    )
 
-    ratings_count = LecturerSubject.objects.values('review__rate').filter(
-        lecturer__slug=lecturer_slug, subject__slug=subject_slug).annotate(count=Count('review')).order_by('-review__rate')
+        ratings_count = LecturerSubject.objects.values('review__rate').filter(
+            lecturer__slug=lecturer_slug, subject__slug=subject_slug).annotate(count=Count('review')).order_by('-review__rate')
 
-    queryset = Review.objects.filter(
-        lecturer_subject__lecturer__slug=lecturer_slug, lecturer_subject__subject__slug=subject_slug)
-    return render(request, 'main/subject.html', {'reviews': queryset, 'lecturer': lecturer, 'ratings': ratings_count})
+        queryset = Review.objects.filter(
+            lecturer_subject__lecturer__slug=lecturer_slug, lecturer_subject__subject__slug=subject_slug)
+        return render(request, 'main/subject.html', {'reviews': queryset, 'lecturer': lecturer, 'ratings': ratings_count, 'form': form})

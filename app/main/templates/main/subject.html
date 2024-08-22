@@ -5,6 +5,7 @@
 
 {% block head %}
 <link rel="stylesheet" href="{% static 'main/css/subject.css' %}">
+<link rel="stylesheet" href="{% static 'main/css/form.css' %}">
 {% endblock head %}
 
 
@@ -52,11 +53,41 @@
 </div>
 
 
-
-
-
-
-
+<!-- Review form -->
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="form-container">
+                {% if user.is_authenticated %}
+                <script src="{% static 'main/js/review_form.js' %}"></script>
+                <form method="post" action="{{ request.path }}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="rate">Rate:</label>
+                        <div id="star-rating" class="star-rating text-center">★★★★★</div>
+                        <input type="range" class="form-control-range" id="rate" name="rate" min="1" max="5" value="5"
+                            oninput="updateStars(this.value)">
+                        <div class="d-flex justify-content-between">
+                            <span>1</span>
+                            <span>2</span>
+                            <span>3</span>
+                            <span>4</span>
+                            <span>5</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="comment">Comment:</label>
+                        <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+                {% else %}
+                <p class="text-center">You need to <a href="{% url 'login' %}">log in</a> to comment.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <!-- Comments -->
