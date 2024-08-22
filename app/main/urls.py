@@ -20,5 +20,6 @@ urlpatterns = [
 
     # Templates
     path('', home, name='home'),
-    path('<str:lecturer_slug>/<str:subject_slug>/', subjects, name='subjects')
+    path('ratings/<str:lecturer_slug>/<str:subject_slug>/',
+         subjects, name='subjects')
 ]

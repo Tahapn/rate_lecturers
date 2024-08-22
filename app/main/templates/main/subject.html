@@ -1,60 +1,30 @@
 {% extends 'with_nav.html' %}
-
+{% load static %}
 
 {% block title %} subject {% endblock title %}
 
+{% block head %}
+<link rel="stylesheet" href="{% static 'main/css/subject.css' %}">
+{% endblock head %}
+
+
 {% block content %}
 
+<!-- Script for distribution  -->
+<script src="{% static 'main/js/distribution_for_subject.js' %}"></script>
 
-
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var total = 0;
-        var ratings = document.querySelectorAll('.progress-bar');
-        ratings.forEach(function (bar) {
-            total += parseInt(bar.getAttribute('aria-valuenow'));
-        });
-        ratings.forEach(function (bar) {
-            var count = parseInt(bar.getAttribute('aria-valuenow'));
-            bar.style.width = (count / total) * 100 + '%';
-            bar.textContent = count + ' ratings';
-            bar.style.backgroundColor = getColor(bar.getAttribute('data-rating'));
-        });
-
-        function getColor(rating) {
-            switch (rating) {
-                case '5':
-                    return '#28a745'; // Green
-                case '4':
-                    return '#17a2b8'; // Blue
-                case '3':
-                    return '#ffc107'; // Yellow
-                case '2':
-                    return '#fd7e14'; // Orange
-                case '1':
-                    return '#dc3545'; // Red
-                default:
-                    return '#6c757d'; // Grey
-            }
-        }
-    });
-
-</script>
-
-
-
+<!-- lecturer info -->
 <div class="container mt-5">
-    <div class="card" style="background-color: #222; border-color: #444;">
+    <div class="card card-custom">
         <div class="card-body">
             <div class="row">
                 <div class="col-md-4 text-center">
                     <img src="{{ lecturer.picture.url }}" alt="{{ lecturer.first_name }} {{ lecturer.last_name }}"
-                        style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%;" class="mb-3">
+                        class="mb-3">
                     <h2 class="card-title">{{ lecturer.first_name }} {{ lecturer.last_name }}</h2>
                 </div>
                 <div class="col-md-8">
-                    <h4 style="color: #aaa;">Average Rating: {{ lecturer.average|floatformat:1 }}</h4>
+                    <h4>Average Rating: {{ lecturer.average|floatformat:1 }}</h4>
 
                     <h5 class="mt-4">Rating Distribution</h5>
                     <ul class="list-unstyled mt-2">
@@ -63,11 +33,12 @@
                             <div class="d-flex justify-content-between">
                                 <span>{{ rating.review__rate }} Stars</span>
                             </div>
-                            <div class="progress" style="height: 20px; background-color: #444;">
+                            <div class="progress progress-custom">
                                 <div class="progress-bar" role="progressbar" data-rating="{{ rating.review__rate }}"
-                                    style="width: {% widthratio rating.count ratings_total 100 %}%; background-color: {% if rating.review__rate == 5 %}#28a745{% elif rating.review__rate == 4 %}#17a2b8{% elif rating.review__rate == 3 %}#ffc107{% elif rating.review__rate == 2 %}#fd7e14{% else %}#dc3545{% endif %};"
+                                    style="width: {% widthratio rating.count ratings_total 100 %}%;"
                                     aria-valuenow="{{ rating.count }}" aria-valuemin="0"
-                                    aria-valuemax="{{ ratings_total }}">
+                                    aria-valuemax="{{ ratings_total }}"
+                                    class="progress-bar-custom-{{ rating.review__rate }}">
                                     {{ rating.count }}%
                                 </div>
                             </div>
@@ -88,11 +59,11 @@
 
 
 
-
+<!-- Comments -->
 <div class="container mt-4">
     {% for review in reviews %}
     {% if review.comment %}
-    <div class="card mb-3 bg-dark text-white rounded" style="border-radius: 15px;">
+    <div class="card mb-3 card-review">
         <div class="card-body">
             <div class="d-flex align-items-center mb-3">
                 <div class="ml-3">
