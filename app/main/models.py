@@ -67,3 +67,8 @@ class Review(models.Model):
 
     def __str__(self) -> str:
         return f'{self.user.username}-{self.rate}'
+
+    class Meta:
+        unique_together = (
+            ('lecturer_subject', 'user')
+        )

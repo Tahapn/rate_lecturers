@@ -1,7 +1,8 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseRedirect
 from django.db.models import Avg, Count
 from django.db.models.functions import Round
+from django.contrib.auth.decorators import login_required
 from rest_framework import generics
 from rest_framework.viewsets import ReadOnlyModelViewSet
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -71,20 +72,21 @@ def home(request):
 
 
 def subjects(request, lecturer_slug, subject_slug):
+
+    lecturer_subject = get_object_or_404(
+        LecturerSubject, lecturer__slug=lecturer_slug, subject__slug=subject_slug)
+
     if request.method == 'POST':
         post_data = request.POST.copy()
         post_data['rate'] = int(post_data['rate'])
         form = ReviewForm(post_data)
         if form.is_valid():
-            lecturer_subject = LecturerSubject.objects.get(
-                lecturer__slug=lecturer_slug, subject__slug=subject_slug)
             instance = form.save(commit=False)
             instance.user = request.user
             instance.lecturer_subject = lecturer_subject
             instance.save()
             return HttpResponseRedirect(request.get_full_path())
-        else:
-            print(form.errors)
+
     else:
         form = ReviewForm()
 
@@ -94,9 +96,34 @@ def subjects(request, lecturer_slug, subject_slug):
             )
         )
 
+        lecturer = Lecturer.objects.annotate(
+            average=Round(Avg('subjects__review__rate'), 2)
+        ).get(slug=lecturer_slug)
+
+        queryset = Review.objects.filter(
+            lecturer_subject=lecturer_subject)
+
+        user_review = queryset.filter(user=request.user).first(
+        ) if request.user.is_authenticated else None
+
         ratings_count = LecturerSubject.objects.values('review__rate').filter(
             lecturer__slug=lecturer_slug, subject__slug=subject_slug).annotate(count=Count('review')).order_by('-review__rate')
 
-        queryset = Review.objects.filter(
-            lecturer_subject__lecturer__slug=lecturer_slug, lecturer_subject__subject__slug=subject_slug)
-        return render(request, 'main/subject.html', {'reviews': queryset, 'lecturer': lecturer, 'ratings': ratings_count, 'form': form})
+        return render(request, 'main/subject.html', {'reviews': queryset, 'lecturer': lecturer, 'ratings': ratings_count, 'form': form, 'user_review': user_review})
+
+
+@login_required
+def edit_review(request, review_id):
+    review = get_object_or_404(Review, pk=review_id)
+
+    if request.user != review.user:
+        msg = ["You don't have permission to access this url"]
+        return render(request, 'redirect.html', {'messages': msg})
+    elif request.method == 'POST':
+        form = ReviewForm(instance=review, data=request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+    else:
+        form = ReviewForm(instance=review)
+        return render(request, 'main/edit_review.html', {'form': form})

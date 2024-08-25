@@ -1,0 +1,10 @@
+{% extends 'index.html' %}
+
+{% block content %}
+{% for message in messages %}
+
+<p>{{ message }}</p>
+{% endfor %}
+
+<a href="{% url 'home' %}">Home</a>
+{% endblock content %}

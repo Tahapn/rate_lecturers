@@ -45,7 +45,7 @@ def create_user(request):
         form = UserForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('')
+            return redirect('home')
     else:
         form = UserForm()
     return render(request, 'user/create_user.html', {'form': form})

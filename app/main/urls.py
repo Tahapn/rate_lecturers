@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import SimpleRouter
-from .views import home, subjects, LecturerViewSet, LecturerSubjectList, LecturerSubjectDetail, ReviewList, ReviewDetail
+from .views import home, subjects, edit_review, LecturerViewSet, LecturerSubjectList, LecturerSubjectDetail, ReviewList, ReviewDetail
 
 router = SimpleRouter()
 
@@ -21,5 +21,6 @@ urlpatterns = [
     # Templates
     path('', home, name='home'),
     path('ratings/<str:lecturer_slug>/<str:subject_slug>/',
-         subjects, name='subjects')
+         subjects, name='subjects'),
+    path('edit-comment/<int:review_id>/', edit_review, name='edit-review')
 ]
