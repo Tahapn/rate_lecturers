@@ -20,14 +20,16 @@ class TokenView(generics.CreateAPIView):
     serializer_class = UserTokenSerializer
 
     def post(self, request, *args, **kwargs):
-        username = self.request.POST['username']
-        password = self.request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user:
-            token, _ = Token.objects.get_or_create(user=user)
-            return Response({'Token': token.key}, status=status.HTTP_201_CREATED)
-        else:
-            return Response({'msg': 'Invalid credentials or user does not exitst'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = UserTokenSerializer(data=request.data)
+
+        if serializer.is_valid(raise_exception=True):
+            user = authenticate(
+                request, **serializer.validated_data)
+            if user:
+                token, _ = Token.objects.get_or_create(user=user)
+                return Response({'Token': token.key}, status=status.HTTP_201_CREATED)
+            else:
+                return Response({'msg': 'Invalid credentials or user does not exitst'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
